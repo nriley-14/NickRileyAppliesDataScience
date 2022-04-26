@@ -1,0 +1,80 @@
+---
+title: "An_Interview_Test"
+output: html_document
+date: '2022-04-26'
+---
+
+```{r}
+library(readr)
+library(tidyverse)
+```
+
+```{r}
+grades_url = 'https://raw.githubusercontent.com/gato365/emandoesgato365/main/content/post/2022-04-25-an-interview-test/grades.csv'
+assignments_url = 'https://raw.githubusercontent.com/gato365/emandoesgato365/main/content/post/2022-04-25-an-interview-test/assignments.csv' 
+students_url = 'https://raw.githubusercontent.com/gato365/emandoesgato365/main/content/post/2022-04-25-an-interview-test/students.csv'
+grades_df = read_csv(url(grades_url))
+assignments_df = read_csv(url(assignments_url))
+students_df = read_csv(url(students_url))
+```
+
+#Question 1:
+There are 180 students with not duplicates because each student has their own unique ID.
+
+#Question 2: 
+There are six distinct majors, with the amount distribution as follows:
+  Business: 27
+  Engineering: 52
+  English: 30
+  Philosophy: 30
+  Science: 21
+  Statistics and Math: 20
+
+```{r}
+table(students_df$major)
+```
+
+
+#Question 3:
+
+```{r}
+table(students_df$major, students_df$student_level)
+```
+                      Freshmen   Sophomore   Junior   Senior
+Business                     9          11        3        4
+Engineering                 24          14       14        0
+English                     11           8        5        6
+Philosophy                  14           7        8        1
+Science                      8           6        5        2
+Statistics and Math          6           9        2        3
+
+#Question 4: Senior engineers have the lowest number of students, having zero students enrolled.
+
+#Question 5:
+
+
+```{r}
+ggplot(students_df, aes(y = fct_rev(fct_infreq(major)))) + 
+  geom_bar(fill = "#F57251") + 
+  labs(title = "Number of Students in Each Major", x = "Amount of Students", y = "Majors") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+#Question 6:
+
+```{r}
+
+mod_students_df = students_df %>%
+  mutate(student_grade = gsub(".*-", "", student_level))
+
+ggplot(mod_students_df, aes(y = major, fill = student_grade)) +
+  geom_bar() + 
+  scale_fill_manual(values=c("#7BA88A", "#E67D65", "#65A2E6", "#FEDA70")) + 
+  labs(title = "Number of Students in Each Major", x = "Amount of Students", y = "Majors") +
+  theme_gray() + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+```
