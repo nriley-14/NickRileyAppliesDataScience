@@ -52,7 +52,6 @@ Statistics and Math          6           9        2        3
 
 #Question 5:
 
-
 ```{r}
 ggplot(students_df, aes(y = fct_rev(fct_infreq(major)))) + 
   geom_bar(fill = "#F57251") + 
@@ -78,3 +77,61 @@ ggplot(mod_students_df, aes(y = major, fill = student_grade)) +
 
 
 ```
+
+#Question 7
+
+```{r}
+student_grades_df = merge(x=students_df, y=grades_df)
+```
+
+#Question 8
+Student ID 288941 performed the worst on asignment 1 as an English major.
+
+
+#Question 9
+
+```{r}
+average_junior_student_grades_df = student_grades_df %>% 
+  filter(student_level == '3-Junior') %>% 
+  group_by(assignment_id) %>% 
+  summarise_at(vars(numeric_grade), list(grade = mean)) %>% 
+  ungroup()
+```
+
+Assignment number 10 had the highest average grade.
+
+#Question 10
+
+```{r}
+average_math_student_grades_df = student_grades_df %>% 
+  filter(major == 'Statistics and Math') %>% 
+  group_by(student_level) %>% 
+  summarise_at(vars(numeric_grade), list(average_grade = mean))
+```
+
+The sophomores had the highest average at 17.63333.
+
+#Question 11
+```{r}
+gradebook_df = merge(student_grades_df, assignments_df)
+```
+
+#Question 12
+```{r}
+exam_gradebook_df = gradebook_df %>% 
+  filter(assignment_category == 'Exam') %>% 
+  mutate(student_level = gsub(".*-", "", student_level)) %>% 
+  mutate(Major = major)
+
+exam_gradebook_df %>% 
+  ggplot(aes(x=Major, y=numeric_grade, fill = Major)) + 
+  geom_bar(stat = "identity") +
+  ylim(0,100) +
+  facet_grid(cols = vars(student_level)) +
+  scale_x_discrete(labels = element_blank()) +
+    labs(title = "Number of Students in Each Major", x = "Grade Level", y = "Assignment Grade") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5), strip.text.x = element_text(size = 8))
+```
+
+
