@@ -72,7 +72,7 @@ ggplot(mod_students_df, aes(y = major, fill = student_grade)) +
   geom_bar() + 
   scale_fill_manual(values=c("#7BA88A", "#E67D65", "#65A2E6", "#FEDA70")) + 
   labs(title = "Number of Students in Each Major", x = "Amount of Students", y = "Majors") +
-  theme_gray() + 
+  theme_bw() + 
   theme(plot.title = element_text(hjust = 0.5))
 
 
@@ -129,9 +129,56 @@ exam_gradebook_df %>%
   ylim(0,100) +
   facet_grid(cols = vars(student_level)) +
   scale_x_discrete(labels = element_blank()) +
-    labs(title = "Number of Students in Each Major", x = "Grade Level", y = "Assignment Grade") +
-  theme_minimal() + 
+    labs(title = "Number of Students in Each Major", x = "Grade Level", y = "Average Exam Grade") +
+  theme_bw() + 
   theme(plot.title = element_text(hjust = 0.5), strip.text.x = element_text(size = 8))
 ```
+#Question 13
+
+a. 
+```{r}
+exam_2_freshman_df = gradebook_df %>% 
+  filter(assignment_category == 'Exam') %>% 
+  filter(assignment_id == "20") %>% 
+  filter(student_level == "1-Freshmen")
+  
+```
+
+
+b.
+Explanatory Variable: major
+Response Variable: exam grade
+
+c.
+Null hypothesis: There is no significant difference between freshman exam grades based off major.
+Alternative hypothesis: There is a significant difference between freshman with different majors and their average exam grades.
+
+d.
+```{r}
+summary_exam_df = exam_2_freshman_df %>% 
+  group_by(major) %>% 
+  summarise(sample_size = n(),
+            mean_grade = mean(numeric_grade,na.rm = TRUE),
+            sd_grade = sd(numeric_grade,na.rm = TRUE))
+
+summary_exam_df
+```
+
+```{r}
+exam_2_freshman_df %>% 
+  ggplot(aes(x = major, y = numeric_grade)) +
+  geom_boxplot() +
+  stat_summary(fun ="mean", color = 'blue')+
+  labs(x = 'Major', y = 'Grade', title = 'Box Plot for One-Way ANOVA') +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5, face = 'bold', size = 15))
+```
+
+
+
+e. Since there is an observable difference between exam scores based on different majors we can reject the null hypothesis and accept the alternative.
+
+
+
 
 
