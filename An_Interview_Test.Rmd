@@ -7,6 +7,8 @@ date: '2022-04-26'
 ```{r}
 library(readr)
 library(tidyverse)
+library(broom)
+library(ggpubr)
 ```
 
 ```{r}
@@ -178,6 +180,47 @@ exam_2_freshman_df %>%
 
 e. Since there is an observable difference between exam scores based on different majors we can reject the null hypothesis and accept the alternative.
 
+
+#Question 14
+
+a.
+```{r}
+mod_exam_df = gradebook_df %>% 
+    mutate(assignment_id = as.factor(assignment_id)) %>% 
+  filter(assignment_category == 'Exam')
+
+```
+
+
+b.
+Explanatory Variables: major and assignment_id 
+Response Variable: exam grade
+
+c.
+Null hypothesis: There is no significant difference between freshman exam grades based off major or the different exams.
+Alternative hypothesis: There is a significant difference between freshman with different majors on the different exams and their average exam grades.
+
+d.
+```{r}
+summary_mod_exam_df = mod_exam_df %>% 
+  group_by(major, assignment_id) %>% 
+  summarise(sample_size = n(),
+            mean_grade = mean(numeric_grade,na.rm = TRUE),
+            sd_grade = sd(numeric_grade,na.rm = TRUE))
+
+summary_exam_df
+```
+
+```{r}
+ggboxplot(mod_exam_df, x = "major", y = "numeric_grade", color = "assignment_id",
+          palette = c("#00AFBB", "#E7B800")) +
+  labs(x = 'Major', y = 'Grade', title = 'Average Test Grade of Two Exams Based on Major') +
+  theme(plot.title = element_text(hjust = 0.5, face = 'bold', size = 12), axis.text=element_text(size=7))
+```
+
+
+e. 
+Since there is a significant difference between different majors and different exams, we can reject the null hypothesis.
 
 
 
