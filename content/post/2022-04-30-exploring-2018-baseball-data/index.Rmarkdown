@@ -1,0 +1,234 @@
+---
+title: Exploring 2018 Baseball Data
+author: ''
+date: '2022-04-30'
+slug: exploring-2018-baseball-data
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2022-04-30T16:24:32Z'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+```{r}
+library(tidyverse)
+library(readxl)
+library(corrplot)
+```
+
+
+```{r}
+standard_pitching_df = read_xlsx("three_types_of_pitching_2018.xlsx",sheet = "standard_pitching")
+
+```
+
+
+
+```{r}
+mod_1_standard_pitching_df = standard_pitching_df %>% 
+  distinct(Name, .keep_all = TRUE)%>% 
+  drop_na()  %>% 
+  mutate(ERA = as.numeric(ERA))
+```
+
+
+## Question 1
+How old is the average player at each level of play (American League, National League, Major League)?
+#### Variables
+Response: Age
+Explanatory: Lg
+
+### Visualize Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  ggplot(aes(x=Lg, y=Age, fill=Lg)) +
+  geom_boxplot()+
+  labs(x = 'League', y = 'Age', title = 'Ages by League') +
+  theme(plot.title = element_text(hjust = 0.5, size = 20, face = 'bold', color = 'blue'))
+```
+
+### Summarize of Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  group_by(Lg) %>% 
+  summarise(n(),
+            mean(Age),
+            sd(Age))
+```
+
+### Analysis of Data
+```{r}
+mod1_pitching_df_aov = aov(Age~Lg, data = mod_1_standard_pitching_df)
+summary(mod1_pitching_df_aov)
+```
+
+
+
+## Question 2     
+How many runs does the average pitcher allow in one inning by Age? (Runs allowed / Innings pitched by Age)
+#### Variables
+Response: ERA
+Explanatory: Age
+
+
+### Visualize Data
+
+```{r}
+mod_1_standard_pitching_df %>% 
+  ggplot(aes(x = Age, y = ERA)) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = 'y ~ x',se = FALSE) + 
+  labs(x = 'Age', y = 'Estimated Runs Allowed', title = 'Age vs Average Runs Allowed Every 9 innings') +
+  theme(plot.title = element_text(hjust = 0.5, size = 10, face = 'bold', color = 'red'))
+```
+
+### Summarize of Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  select(Age,ERA) %>% 
+  cor()
+```
+#### Summary of Age
+```{r}
+summary(mod_1_standard_pitching_df$Age)
+```
+
+#### Summary of ERA
+```{r}
+summary(mod_1_standard_pitching_df$ERA)
+```
+
+### Analysis of Data
+```{r}
+mod1_pitching_df_lm = lm(ERA~Age, data = mod_1_standard_pitching_df)
+summary(mod1_pitching_df_lm)
+```
+
+
+## Question 3
+Typically, do older or younger pitchers get more playing time (Innings Pitched), or is there not correlation?
+#### Variables
+Response: IP
+Explanatory: Age
+
+
+### Visualize Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  ggplot(aes(x = Age, y = IP)) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = 'y ~ x',se = FALSE) + 
+  labs(x = 'Age', y = 'Estimated Runs Allowed', title = 'Age vs Average Runs Allowed Every 9 innings') +
+  theme(plot.title = element_text(hjust = 0.5, size = 10, face = 'bold', color = 'red'))
+```
+
+### Summarize of Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  select(Age,IP) %>% 
+  cor()
+```
+#### Summary of Age
+```{r}
+summary(mod_1_standard_pitching_df$Age)
+```
+
+#### Summary of IP
+```{r}
+summary(mod_1_standard_pitching_df$IP)
+```
+
+### Analysis of Data
+```{r}
+mod2_pitching_df_lm = lm(IP~Age, data = mod_1_standard_pitching_df)
+summary(mod2_pitching_df_lm)
+```
+
+
+
+
+
+## Question 4
+Does wild pitches have an impact the number of hits?
+#### Variables
+Response: H (hits)
+Explanatory: WP (wild pitches)
+
+
+### Visualize Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  ggplot(aes(x = WP, y = H)) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = 'y ~ x',se = FALSE) + 
+  labs(x = 'Wild Pitches', y = 'Hits', title = 'Wild Pitches Compared With Hits') +
+  theme(plot.title = element_text(hjust = 0.5, size = 10, face = 'bold', color = 'blue'))
+```
+
+### Summarize of Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  select(WP,H) %>% 
+  cor()
+```
+#### Summary of H
+```{r}
+summary(mod_1_standard_pitching_df$H)
+```
+
+#### Summary of WP
+```{r}
+summary(mod_1_standard_pitching_df$WP)
+```
+
+### Analysis of Data
+```{r}
+mod2_pitching_df_lm = lm(H~WP, data = mod_1_standard_pitching_df)
+summary(mod2_pitching_df_lm)
+```
+
+
+
+## Question 5
+Does earned run averages influence the number of bases on balls per nine innings pitched?
+#### Variables
+Response: BB (Bases on Balls/Walks)
+Explanatory: ERA (Estimated Runs Allowed)
+
+
+### Visualize Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  ggplot(aes(x = ERA, y = BB)) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = 'y ~ x',se = FALSE) + 
+  labs(x = 'Estimated Runs Allowed', y = 'Bases on Balls', title = 'ERA Compared With Bases on Balls') +
+  theme(plot.title = element_text(hjust = 0.5, size = 20, face = 'bold', color = 'orange'))
+```
+
+### Summarize of Data
+```{r}
+mod_1_standard_pitching_df %>% 
+  select(ERA,BB) %>% 
+  cor()
+```
+#### Summary of Age
+```{r}
+summary(mod_1_standard_pitching_df$ERA)
+```
+
+#### Summary of IP
+```{r}
+summary(mod_1_standard_pitching_df$BB)
+```
+
+### Analysis of Data
+```{r}
+mod2_pitching_df_lm = lm(BB~ERA, data = mod_1_standard_pitching_df)
+summary(mod2_pitching_df_lm)
